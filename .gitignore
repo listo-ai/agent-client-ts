@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# pnpm lock — managed at listo-repos/ workspace root, not per-package
+pnpm-lock.yaml
