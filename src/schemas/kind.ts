@@ -1,16 +1,7 @@
 import { z } from "zod";
 
-export const FacetSchema = z.enum([
-  "isProtocol",
-  "isDriver",
-  "isDevice",
-  "isPoint",
-  "isCompute",
-  "isSystem",
-  "isContainer",
-  "isWritable",
-  "isFlow",
-]);
+export { FacetSchema, type Facet, FACET_VALUES } from "../generated/facets.js";
+import { FacetSchema } from "../generated/facets.js";
 
 export const ParentMatcherSchema = z.union([
   z.object({ kind: z.string() }),
@@ -51,7 +42,6 @@ export const KindSchema = z.object({
   placement_class: z.string(),
 });
 
-export type Facet = z.infer<typeof FacetSchema>;
 export type ParentMatcher = z.infer<typeof ParentMatcherSchema>;
 export type Containment = z.infer<typeof ContainmentSchema>;
 export type SlotRole = z.infer<typeof SlotRoleSchema>;
