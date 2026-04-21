@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LifecycleSchema } from "./events.js";
 
 /**
- * Node + slot snapshots as returned by `GET /api/v1/nodes` and
+ * Node + slot snapshots as returned by `GET /api/v1/search?scope=nodes` and
  * `GET /api/v1/node?path=...`. Mirrors the Rust `NodeDto` in
  * `crates/transport-rest/src/routes.rs`.
  */

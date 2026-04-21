@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /**
- * Wire shape for `GET /api/v1/links` and `POST /api/v1/links`.
- * Mirrors `LinkDto` / `EndpointDto` in
- * `crates/transport-rest/src/routes.rs`.
+ * Wire shape for `GET /api/v1/search?scope=links` and
+ * `POST /api/v1/links`. Mirrors `LinkDto` / `EndpointDto` in
+ * `crates/graph/src/links/dto.rs`.
  */
 
 export const LinkEndpointSchema = z.object({
@@ -16,6 +16,9 @@ export const LinkSchema = z.object({
   id: z.string(),
   source: LinkEndpointSchema,
   target: LinkEndpointSchema,
+  /** Shared parent path of both endpoints; `null`/absent when the
+   *  endpoints diverge at the root. */
+  scope_path: z.string().nullable().optional(),
 });
 
 export type LinkEndpoint = z.infer<typeof LinkEndpointSchema>;

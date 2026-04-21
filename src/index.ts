@@ -70,6 +70,7 @@ export type {
   UiResolveRequest,
   UiResolveResponse,
   UiSubscriptionPlan,
+  UiWritePlanEntry,
   UiAction,
   UiTableSource,
   UiTableColumn,
@@ -112,6 +113,12 @@ export type {
   FlowRevisionOp,
 } from "./schemas/flow.js";
 export type { FlowsApi } from "./domain/flows.js";
+export type {
+  AnalyzeApi,
+  AnalyzeRequest,
+  AnalyzeResponse,
+  AnalyzeMeta,
+} from "./domain/analyze.js";
 export type {
   NodeSettingRevisionDto,
   NodeSettingRevisionListResponse,

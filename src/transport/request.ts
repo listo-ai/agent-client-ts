@@ -31,7 +31,7 @@ export interface RequestTransport {
  * constructor injection and calls it for every domain operation.
  *
  * @param subject  Fully-qualified fleet subject, e.g.
- *                 `"fleet.sys.edge-42.api.v1.nodes.list"`.
+ *                 `"fleet.sys.edge-42.api.v1.search"`.
  * @param body     JSON-serialisable request body (can be `undefined`
  *                 for reads).
  * @param timeoutMs  Request deadline in milliseconds.
@@ -52,7 +52,7 @@ export type FleetRequestFn = (
  * path + HTTP verb:
  *
  * ```
- * GET  /api/v1/nodes          →  <prefix>.api.v1.nodes.list
+ * GET  /api/v1/search         →  <prefix>.api.v1.search
  * GET  /api/v1/node?path=...  →  <prefix>.api.v1.node.get
  * POST /api/v1/nodes          →  <prefix>.api.v1.nodes.create
  * DELETE /api/v1/node?...     →  <prefix>.api.v1.node.remove
@@ -60,13 +60,10 @@ export type FleetRequestFn = (
  * POST /api/v1/config         →  <prefix>.api.v1.config.set
  * POST /api/v1/lifecycle      →  <prefix>.api.v1.lifecycle.transition
  * POST /api/v1/seed           →  <prefix>.api.v1.seed.apply
- * GET  /api/v1/blocks        →  <prefix>.api.v1.blocks.list
  * GET  /api/v1/blocks/:id    →  <prefix>.api.v1.block.get
  * POST /api/v1/blocks/:id/enable   →  <prefix>.api.v1.block.enable
  * POST /api/v1/blocks/:id/disable  →  <prefix>.api.v1.block.disable
  * POST /api/v1/blocks/reload →  <prefix>.api.v1.blocks.reload
- * GET  /api/v1/search         →  <prefix>.api.v1.search
- * GET  /api/v1/links          →  <prefix>.api.v1.links.list
  * POST /api/v1/links          →  <prefix>.api.v1.links.create
  * DELETE /api/v1/links/:id    →  <prefix>.api.v1.link.remove
  * GET  /api/v1/auth/whoami    →  <prefix>.api.v1.auth.whoami
@@ -90,7 +87,7 @@ export function pathToSubject(
 
   // Lookup table: `METHOD bare-path` → subject suffix (without prefix).
   const table: Record<string, string> = {
-    "GET /api/v1/nodes":                   "api.v1.nodes.list",
+    "GET /api/v1/search":                  "api.v1.search",
     "GET /api/v1/node":                    "api.v1.node.get",
     "POST /api/v1/nodes":                  "api.v1.nodes.create",
     "DELETE /api/v1/node":                 "api.v1.node.remove",
@@ -98,10 +95,7 @@ export function pathToSubject(
     "POST /api/v1/config":                 "api.v1.config.set",
     "POST /api/v1/lifecycle":              "api.v1.lifecycle.transition",
     "POST /api/v1/seed":                   "api.v1.seed.apply",
-    "GET /api/v1/blocks":                 "api.v1.blocks.list",
     "POST /api/v1/blocks/reload":         "api.v1.blocks.reload",
-    "GET /api/v1/search":                  "api.v1.search",
-    "GET /api/v1/links":                   "api.v1.links.list",
     "POST /api/v1/links":                  "api.v1.links.create",
     "GET /api/v1/auth/whoami":             "api.v1.auth.whoami",
     "GET /api/v1/ui/nav":                  "api.v1.ui.nav",

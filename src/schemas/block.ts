@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Block summary as returned by `GET /api/v1/blocks` and
+ * Block summary as returned by `GET /api/v1/search?scope=blocks` and
  * `GET /api/v1/blocks/:id`. Mirrors `LoadedPluginSummary` in
  * `crates/blocks-host/src/registry.rs` — every field here
  * exists on the Rust side; nothing is invented client-side.

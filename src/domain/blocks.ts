@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type { RequestTransport } from "../transport/request.js";
 import {
   PluginRuntimeEntrySchema,
@@ -11,16 +13,9 @@ import type {
 } from "../schemas/block.js";
 
 /**
- * Block operations against the Rust REST surface
- * (`crates/transport-rest/src/blocks.rs`):
- *   `GET  /api/v1/blocks`               → PluginSummary[]
- *   `GET  /api/v1/blocks/:id`           → PluginSummary
- *   `POST /api/v1/blocks/:id/enable`    → 204
- *   `POST /api/v1/blocks/:id/disable`   → 204
- *   `POST /api/v1/blocks/reload`        → 204
- *
- * List and detail share `LoadedPluginSummary` on the Rust side so
- * there's no separate `PluginDetail` type here either.
+ * Block operations against the agent's REST surface. Listing goes
+ * through the generic `GET /api/v1/search?scope=blocks` endpoint; the
+ * rest hit dedicated `/api/v1/blocks/...` routes.
  */
 export interface BlocksApi {
   list(): Promise<PluginSummary[]>;
@@ -35,13 +30,19 @@ export interface BlocksApi {
   runtimeAll(): Promise<PluginRuntimeEntry[]>;
 }
 
+const BlocksSearchEnvelope = z.object({
+  scope: z.string(),
+  hits: z.array(PluginSummarySchema),
+  meta: z.object({ total: z.number().int().nonnegative() }),
+});
+
 export function createBlocksApi(http: RequestTransport, apiVersion: number): BlocksApi {
   const base = `/api/v${apiVersion}`;
 
   return {
     async list(): Promise<PluginSummary[]> {
-      const raw = await http.get<unknown[]>(`${base}/blocks`);
-      return raw.map((r) => PluginSummarySchema.parse(r));
+      const raw = await http.get<unknown>(`${base}/search?scope=blocks`);
+      return BlocksSearchEnvelope.parse(raw).hits;
     },
 
     async get(id: string): Promise<PluginSummary> {

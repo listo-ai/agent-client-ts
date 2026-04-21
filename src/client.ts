@@ -17,6 +17,7 @@ import { createHistoryApi } from "./domain/history.js";
 import { createAiApi } from "./domain/ai.js";
 import { createUsersApi } from "./domain/users.js";
 import { createFlowsApi } from "./domain/flows.js";
+import { createAnalyzeApi } from "./domain/analyze.js";
 import { createNodeSettingsApi } from "./domain/node-settings.js";
 import type { NodesApi } from "./domain/nodes.js";
 import type { SlotsApi } from "./domain/slots.js";
@@ -33,6 +34,7 @@ import type { UiApi } from "./domain/ui.js";
 import type { AiApi } from "./domain/ai.js";
 import type { UsersApi } from "./domain/users.js";
 import type { FlowsApi } from "./domain/flows.js";
+import type { AnalyzeApi } from "./domain/analyze.js";
 import type { NodeSettingsApi } from "./domain/node-settings.js";
 import { REST_API_VERSION } from "./version.js";
 import { FleetScope } from "./schemas/fleet.js";
@@ -108,6 +110,7 @@ export class AgentClient {
   readonly ai: AiApi;
   readonly users: UsersApi;
   readonly flows: FlowsApi;
+  readonly analyze: AnalyzeApi;
   readonly nodeSettings: NodeSettingsApi;
 
   private constructor(
@@ -139,6 +142,7 @@ export class AgentClient {
     );
     this.users = createUsersApi(transport, REST_API_VERSION);
     this.flows = createFlowsApi(transport, REST_API_VERSION);
+    this.analyze = createAnalyzeApi(transport, REST_API_VERSION);
     this.nodeSettings = createNodeSettingsApi(transport, REST_API_VERSION);
 
     if (FleetScope.isLocal(scope)) {

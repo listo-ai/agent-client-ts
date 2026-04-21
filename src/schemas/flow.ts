@@ -1,14 +1,18 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
-// FlowDto  — returned by GET /api/v1/flows and GET /api/v1/flows/{id}
+// FlowDto  — returned by GET /api/v1/search?scope=flows and GET /api/v1/flows/{id}
 // ---------------------------------------------------------------------------
 
 export const FlowDtoSchema = z.object({
   id: z.string(),
   name: z.string(),
-  /** Serialised flow document — the versioned topology blob. */
-  document: z.unknown(),
+  /**
+   * Serialised flow document — the versioned topology blob. Absent in
+   * `/search?scope=flows` palette rows; present in `GET /flows/:id`
+   * responses.
+   */
+  document: z.unknown().optional(),
   /**
    * ID of the latest revision. `null` for a freshly-created flow that
    * has never had an edit/undo/redo applied.

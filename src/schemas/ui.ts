@@ -415,6 +415,28 @@ export const UiSubscriptionPlanSchema = z.object({
 export type UiSubscriptionPlan = z.infer<typeof UiSubscriptionPlanSchema>;
 
 /**
+ * One entry in the write plan emitted alongside a resolved tree.
+ *
+ * Clients look up by `component_id` when a bound control fires and
+ * POST `{path, slot, value[, expected_generation]}` to
+ * `POST /api/v1/slots`. A missing entry means the control renders
+ * disabled (ACL-denied write or binding error).
+ *
+ * `generation` is present only for `"occ"` entries (optimistic
+ * concurrency check). Keep it current by updating on every
+ * `slot_changed` SSE echo that matches `path` + `slot` before the
+ * next write.
+ */
+export const UiWritePlanEntrySchema = z.object({
+  component_id: z.string(),
+  path: z.string(),
+  slot: z.string(),
+  concurrency: z.enum(["lww", "occ"]),
+  generation: z.number().int().nonnegative().optional(),
+});
+export type UiWritePlanEntry = z.infer<typeof UiWritePlanEntrySchema>;
+
+/**
  * Response envelope — untagged. A successful resolve carries
  * `{render, subscriptions, meta}`; a dry run carries `{errors}`.
  * Discriminated by whichever key is present.
@@ -423,6 +445,8 @@ export const UiResolveResponseSchema = z.union([
   z.object({
     render: UiComponentTreeSchema,
     subscriptions: z.array(UiSubscriptionPlanSchema),
+    /** Write plan — one entry per two-way bound control. See {@link UiWritePlanEntry}. */
+    writes: z.array(UiWritePlanEntrySchema).default([]),
     meta: UiResolveMetaSchema,
   }),
   z.object({

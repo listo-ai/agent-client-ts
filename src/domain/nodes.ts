@@ -1,6 +1,7 @@
+import { z } from "zod";
+
 import type { RequestTransport } from "../transport/request.js";
 import {
-  NodeListResponseSchema,
   NodeSchemaSchema,
   NodeSnapshotSchema,
 } from "../schemas/node.js";
@@ -11,12 +12,11 @@ import type {
 } from "../schemas/node.js";
 
 /**
- * Node operations against the Rust REST surface
- * (`crates/transport-rest/src/routes.rs`):
- *   `GET  /api/v1/nodes`
- *   `GET  /api/v1/node?path=...`
- *   `POST /api/v1/nodes` `{parent, kind, name}` → `{id, path}`
- *   `DELETE /api/v1/node?path=...`
+ * Node operations against the agent REST surface. Listing goes through
+ * the generic `GET /api/v1/search?scope=nodes` endpoint — this wrapper
+ * unwraps the `{ scope, hits, meta }` envelope so callers keep
+ * receiving `NodeListResponse`. Single-node reads and writes use
+ * dedicated routes (`/api/v1/node`, `POST /api/v1/nodes`).
  */
 export interface NodesApi {
   getNodes(): Promise<NodeSnapshot[]>;
@@ -41,6 +41,22 @@ export interface NodesApi {
   removeNode(path: string): Promise<void>;
 }
 
+/**
+ * `/api/v1/search` envelope, narrowed to the `nodes` scope. Pagination
+ * fields are optional on the generic envelope but always populated by
+ * the `nodes` scope.
+ */
+const NodesSearchEnvelope = z.object({
+  scope: z.string(),
+  hits: z.array(NodeSnapshotSchema),
+  meta: z.object({
+    total: z.number().int().nonnegative(),
+    page: z.number().int().positive().optional(),
+    size: z.number().int().positive().optional(),
+    pages: z.number().int().nonnegative().optional(),
+  }),
+});
+
 export function createNodesApi(http: RequestTransport, apiVersion: number): NodesApi {
   const base = `/api/v${apiVersion}`;
   const getNodesPage = async (params: {
@@ -50,15 +66,23 @@ export function createNodesApi(http: RequestTransport, apiVersion: number): Node
     size?: number;
   } = {}): Promise<NodeListResponse> => {
     const qs = new URLSearchParams();
+    qs.set("scope", "nodes");
     if (params.filter) qs.set("filter", params.filter);
     if (params.sort) qs.set("sort", params.sort);
     if (params.page !== undefined) qs.set("page", String(params.page));
     if (params.size !== undefined) qs.set("size", String(params.size));
-    const suffix = qs.toString();
-    const raw = await http.get<unknown>(
-      `${base}/nodes${suffix ? `?${suffix}` : ""}`,
-    );
-    return NodeListResponseSchema.parse(raw);
+    const raw = await http.get<unknown>(`${base}/search?${qs.toString()}`);
+    const env = NodesSearchEnvelope.parse(raw);
+    const total = env.meta.total;
+    return {
+      data: env.hits,
+      meta: {
+        total,
+        page: env.meta.page ?? 1,
+        size: env.meta.size ?? Math.max(total, 1),
+        pages: env.meta.pages ?? 1,
+      },
+    };
   };
 
   return {

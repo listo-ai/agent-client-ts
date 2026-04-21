@@ -1,10 +1,11 @@
+import { z } from "zod";
+
 import type { RequestTransport } from "../transport/request.js";
 import {
   FlowDtoSchema,
   FlowMutationResultSchema,
   FlowRevisionDtoSchema,
   FlowRevisionListResponseSchema,
-  FlowListResponseSchema,
 } from "../schemas/flow.js";
 import type {
   FlowDto,
@@ -13,6 +14,17 @@ import type {
   FlowRevisionListResponse,
   FlowListResponse,
 } from "../schemas/flow.js";
+
+const FlowsSearchEnvelope = z.object({
+  scope: z.string(),
+  hits: z.array(FlowDtoSchema),
+  meta: z.object({
+    total: z.number().int().nonnegative(),
+    page: z.number().int().positive().optional(),
+    size: z.number().int().positive().optional(),
+    pages: z.number().int().nonnegative().optional(),
+  }),
+});
 
 /**
  * Flows API — undo/redo/revert and revision history for flow documents.
@@ -121,7 +133,8 @@ export function createFlowsApi(
   http: RequestTransport,
   apiVersion: number,
 ): FlowsApi {
-  const base = `/api/v${apiVersion}/flows`;
+  const apiBase = `/api/v${apiVersion}`;
+  const base = `${apiBase}/flows`;
 
   function buildListQs(opts?: { limit?: number; offset?: number }): string {
     const qs = new URLSearchParams();
@@ -132,9 +145,20 @@ export function createFlowsApi(
   }
 
   return {
-    async list(opts) {
-      const raw = await http.get<unknown>(`${base}${buildListQs(opts)}`);
-      return FlowListResponseSchema.parse(raw);
+    async list(opts): Promise<FlowListResponse> {
+      const qs = new URLSearchParams();
+      qs.set("scope", "flows");
+      if (opts?.limit !== undefined) {
+        qs.set("size", String(opts.limit));
+        const limit = opts.limit;
+        const offset = opts.offset ?? 0;
+        if (limit > 0) {
+          qs.set("page", String(Math.floor(offset / limit) + 1));
+        }
+      }
+      const raw = await http.get<unknown>(`${apiBase}/search?${qs.toString()}`);
+      const env = FlowsSearchEnvelope.parse(raw);
+      return { data: env.hits, total: env.meta.total };
     },
 
     async get(id) {
