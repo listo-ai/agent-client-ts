@@ -3,12 +3,13 @@ import { KindSchema } from "../schemas/kind.js";
 import type { Kind } from "../schemas/kind.js";
 
 /**
- * Query options accepted by `/api/v1/kinds`. All fields are optional
- * and compose — e.g. `{ facet: "isCompute", filter: "org==com.listo" }`
- * returns compute-faceted kinds published by `com.listo`.
+ * Query options accepted by the kind palette — issued against
+ * `GET /api/v1/search?scope=kinds`. All fields are optional and
+ * compose: `{ facet: "isCompute", filter: "org==com.listo" }` returns
+ * compute-faceted kinds published by `com.listo`.
  *
- * The `filter` / `sort` strings are RSQL expressions over the palette's
- * exposed fields (see the agent's `kinds_query_schema`):
+ * `filter` / `sort` are RSQL expressions over the palette's exposed
+ * fields (see the agent's `kinds_query_schema`):
  *
  * | Field             | Operators                | Example                        |
  * |-------------------|--------------------------|--------------------------------|
@@ -32,7 +33,7 @@ export interface ListKindsOptions {
 export interface KindsApi {
   /**
    * List kinds matching the given options. Omit `opts` to return
-   * everything (same as the bare `GET /api/v1/kinds` from v1.
+   * everything.
    */
   list(opts?: ListKindsOptions): Promise<Kind[]>;
 
@@ -45,22 +46,32 @@ export interface KindsApi {
   listPlaceableUnder(parentPath: string): Promise<Kind[]>;
 }
 
+/**
+ * Envelope the server emits for every scope. This wrapper unwraps
+ * `hits` so callers keep receiving a plain `Kind[]`.
+ */
+interface SearchEnvelope {
+  scope: string;
+  hits: unknown[];
+  meta: { total: number };
+}
+
 function buildQueryString(opts: ListKindsOptions): string {
   const qs = new URLSearchParams();
+  qs.set("scope", "kinds");
   if (opts.filter) qs.set("filter", opts.filter);
   if (opts.sort) qs.set("sort", opts.sort);
   if (opts.facet) qs.set("facet", opts.facet);
   if (opts.placeableUnder) qs.set("placeable_under", opts.placeableUnder);
-  const rendered = qs.toString();
-  return rendered ? `?${rendered}` : "";
+  return `?${qs.toString()}`;
 }
 
 export function createKindsApi(http: RequestTransport, apiVersion: number): KindsApi {
-  const base = `/api/v${apiVersion}/kinds`;
+  const base = `/api/v${apiVersion}/search`;
 
   const list = async (opts: ListKindsOptions = {}): Promise<Kind[]> => {
-    const raw = await http.get<unknown[]>(`${base}${buildQueryString(opts)}`);
-    return raw.map((entry) => KindSchema.parse(entry));
+    const envelope = await http.get<SearchEnvelope>(`${base}${buildQueryString(opts)}`);
+    return envelope.hits.map((entry) => KindSchema.parse(entry));
   };
 
   return {

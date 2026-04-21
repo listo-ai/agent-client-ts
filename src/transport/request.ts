@@ -65,7 +65,7 @@ export type FleetRequestFn = (
  * POST /api/v1/blocks/:id/enable   →  <prefix>.api.v1.block.enable
  * POST /api/v1/blocks/:id/disable  →  <prefix>.api.v1.block.disable
  * POST /api/v1/blocks/reload →  <prefix>.api.v1.blocks.reload
- * GET  /api/v1/kinds          →  <prefix>.api.v1.kinds.list
+ * GET  /api/v1/search         →  <prefix>.api.v1.search
  * GET  /api/v1/links          →  <prefix>.api.v1.links.list
  * POST /api/v1/links          →  <prefix>.api.v1.links.create
  * DELETE /api/v1/links/:id    →  <prefix>.api.v1.link.remove
@@ -100,7 +100,7 @@ export function pathToSubject(
     "POST /api/v1/seed":                   "api.v1.seed.apply",
     "GET /api/v1/blocks":                 "api.v1.blocks.list",
     "POST /api/v1/blocks/reload":         "api.v1.blocks.reload",
-    "GET /api/v1/kinds":                   "api.v1.kinds.list",
+    "GET /api/v1/search":                  "api.v1.search",
     "GET /api/v1/links":                   "api.v1.links.list",
     "POST /api/v1/links":                  "api.v1.links.create",
     "GET /api/v1/auth/whoami":             "api.v1.auth.whoami",
@@ -116,7 +116,7 @@ export function pathToSubject(
     [/^\/api\/v\d+\/blocks\/[^/]+\/disable$/, "POST",  "api.v1.block.disable"],
     [/^\/api\/v\d+\/blocks\/[^/]+$/, "GET",            "api.v1.block.get"],
     [/^\/api\/v\d+\/links\/[^/]+$/, "DELETE",           "api.v1.link.remove"],
-    [/^\/api\/v\d+\/kinds/, "GET",                      "api.v1.kinds.list"],
+    [/^\/api\/v\d+\/search/, "GET",                     "api.v1.search"],
   ];
 
   const key = `${method} ${bare}`;
