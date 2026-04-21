@@ -17,6 +17,7 @@ export const FacetSchema = z.enum([
   "isWritable",
   "isFlow",
   "isIO",
+  "isAnywhere",
 ]);
 
 export type Facet = z.infer<typeof FacetSchema>;
