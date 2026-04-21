@@ -40,6 +40,13 @@ export const KindSchema = z.object({
   trigger_policy: z.string().default("on_any"),
   schema_version: z.number().int().nonnegative().default(1),
   placement_class: z.string(),
+  /**
+   * Publisher namespace derived from `id` — first two dot-segments
+   * joined. `com.listo.mqtt-client.client` → `com.listo`;
+   * `sys.logic.heartbeat` → `sys.logic`. Optional + defaulted so
+   * older agents that don't emit the field still parse.
+   */
+  org: z.string().optional().default(""),
 });
 
 export type ParentMatcher = z.infer<typeof ParentMatcherSchema>;

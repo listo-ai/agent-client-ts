@@ -119,3 +119,4 @@ export type {
   NodeSettingsMutationResult,
 } from "./schemas/node-settings.js";
 export type { NodeSettingsApi } from "./domain/node-settings.js";
+export type { KindsApi, ListKindsOptions } from "./domain/kinds.js";
