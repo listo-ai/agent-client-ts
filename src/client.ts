@@ -12,6 +12,8 @@ import { createSeedApi } from "./domain/seed.js";
 import { createBlocksApi } from "./domain/blocks.js";
 import { createKindsApi } from "./domain/kinds.js";
 import { createAuthApi } from "./domain/auth.js";
+import { createPreferencesApi } from "./domain/preferences.js";
+import { createUnitsApi } from "./domain/units.js";
 import { createUiApi } from "./domain/ui.js";
 import { createHistoryApi } from "./domain/history.js";
 import { createAiApi } from "./domain/ai.js";
@@ -30,6 +32,8 @@ import type { SeedApi } from "./domain/seed.js";
 import type { BlocksApi } from "./domain/blocks.js";
 import type { KindsApi } from "./domain/kinds.js";
 import type { AuthApi } from "./domain/auth.js";
+import type { PreferencesApi } from "./domain/preferences.js";
+import type { UnitsApi } from "./domain/units.js";
 import type { UiApi } from "./domain/ui.js";
 import type { AiApi } from "./domain/ai.js";
 import type { UsersApi } from "./domain/users.js";
@@ -105,6 +109,8 @@ export class AgentClient {
   readonly blocks: BlocksApi;
   readonly kinds: KindsApi;
   readonly auth: AuthApi;
+  readonly preferences: PreferencesApi;
+  readonly units: UnitsApi;
   readonly ui: UiApi;
   readonly history: HistoryApi;
   readonly ai: AiApi;
@@ -128,6 +134,8 @@ export class AgentClient {
     this.blocks = createBlocksApi(transport, REST_API_VERSION);
     this.kinds = createKindsApi(transport, REST_API_VERSION);
     this.auth = createAuthApi(transport, REST_API_VERSION);
+    this.preferences = createPreferencesApi(transport, REST_API_VERSION);
+    this.units = createUnitsApi(transport, REST_API_VERSION);
     this.ui = createUiApi(transport, REST_API_VERSION);
     this.history = createHistoryApi(transport, REST_API_VERSION);
     this.ai = createAiApi(

@@ -46,7 +46,7 @@ export class HttpClient implements RequestTransport {
   }
 
   private request(
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     path: string,
     body?: unknown,
   ): Promise<Response> {
@@ -81,6 +81,12 @@ export class HttpClient implements RequestTransport {
 
   async put<T>(path: string, body: unknown): Promise<T> {
     const res = await this.request("PUT", path, body);
+    if (!res.ok) throw await toClientError(res);
+    return res.json() as Promise<T>;
+  }
+
+  async patch<T>(path: string, body: unknown): Promise<T> {
+    const res = await this.request("PATCH", path, body);
     if (!res.ok) throw await toClientError(res);
     return res.json() as Promise<T>;
   }

@@ -48,7 +48,7 @@ export class FleetRequestTransport implements RequestTransport {
   }
 
   private async call<T>(
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     path: string,
     body?: unknown,
   ): Promise<T> {
@@ -103,6 +103,14 @@ export class FleetRequestTransport implements RequestTransport {
 
   async put<T>(path: string, body: unknown): Promise<T> {
     return this.call<T>("PUT", path, body);
+  }
+
+  async patch<T>(path: string, body: unknown): Promise<T> {
+    // Fleet routing for PATCH lands when a fleet subject is registered
+    // on the Rust side for the target path. Until then, PATCH over
+    // fleet will error in `pathToSubject`, which is the correct loud
+    // failure.
+    return this.call<T>("PATCH", path, body);
   }
 
   async delete(path: string): Promise<void> {

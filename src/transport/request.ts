@@ -19,6 +19,7 @@ export interface RequestTransport {
   /** POST that expects a 204 / empty body. */
   postNoContent(path: string, body: unknown): Promise<void>;
   put<T>(path: string, body: unknown): Promise<T>;
+  patch<T>(path: string, body: unknown): Promise<T>;
   delete(path: string): Promise<void>;
 }
 
@@ -79,7 +80,7 @@ export type FleetRequestFn = (
  */
 export function pathToSubject(
   prefix: string,
-  method: "GET" | "POST" | "PUT" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   path: string,
 ): string {
   // Strip query string for routing; query params ride in the body payload.

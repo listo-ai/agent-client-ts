@@ -47,7 +47,27 @@ export type {
   PluginRuntimeState,
   PluginRuntimeEntry,
 } from "./schemas/block.js";
-export type { WhoAmI, Scope } from "./schemas/auth.js";
+export type {
+  WhoAmI,
+  Scope,
+  SetupRequest,
+  SetupResponse,
+  EnrollRequest,
+  EnrollResponse,
+} from "./schemas/auth.js";
+export type {
+  ResolvedPreferences,
+  OrgPreferences,
+  PreferencesPatch,
+  PreferenceField,
+} from "./schemas/preferences.js";
+export {
+  ResolvedPreferencesSchema,
+  OrgPreferencesSchema,
+  PreferencesPatchSchema,
+} from "./schemas/preferences.js";
+export type { UnitRegistry, QuantityEntry } from "./schemas/units.js";
+export { UnitRegistrySchema, QuantityEntrySchema } from "./schemas/units.js";
 // FleetScope is both a const namespace (constructors/guards) and a discriminated
 // union type — a single export covers both because TS tracks value and type
 // declarations under the same identifier.
