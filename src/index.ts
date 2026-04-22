@@ -66,8 +66,24 @@ export {
   OrgPreferencesSchema,
   PreferencesPatchSchema,
 } from "./schemas/preferences.js";
-export type { UnitRegistry, QuantityEntry } from "./schemas/units.js";
-export { UnitRegistrySchema, QuantityEntrySchema } from "./schemas/units.js";
+export type {
+  UnitRegistry,
+  QuantityEntry,
+  UnitEntry,
+  AffineCoeffs,
+} from "./schemas/units.js";
+export {
+  UnitRegistrySchema,
+  QuantityEntrySchema,
+  UnitEntrySchema,
+  AffineCoeffsSchema,
+} from "./schemas/units.js";
+export {
+  convertUnit,
+  unitSymbol,
+  unitLabel,
+  canonicalUnitFor,
+} from "./units/convert.js";
 // FleetScope is both a const namespace (constructors/guards) and a discriminated
 // union type — a single export covers both because TS tracks value and type
 // declarations under the same identifier.

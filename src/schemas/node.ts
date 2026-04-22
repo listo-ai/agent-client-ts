@@ -11,6 +11,18 @@ export const SlotSchema = z.object({
   name: z.string(),
   value: z.unknown(),
   generation: z.number().int().nonnegative(),
+  /**
+   * Physical quantity declared on the slot, if any (snake_case string
+   * form of `spi::Quantity`, e.g. `"temperature"`, `"pressure"`).
+   * Absent for dimensionless slots. Clients pair with user
+   * preferences to decide which display unit to render.
+   */
+  quantity: z.string().optional(),
+  /**
+   * Unit the stored `value` is expressed in. `undefined` means
+   * "canonical for `quantity`" — resolved via `GET /api/v1/units`.
+   */
+  unit: z.string().optional(),
 });
 
 export const NodeSnapshotSchema = z.object({
@@ -61,6 +73,12 @@ export const NodeSlotSchemaSchema = z.object({
   trigger: z.boolean().default(false),
   is_internal: z.boolean().default(false),
   emit_on_init: z.boolean().default(false),
+  /** Physical quantity declared by the slot, if any. */
+  quantity: z.string().optional(),
+  /** Sensor-native unit (pre-ingest-conversion). */
+  sensor_unit: z.string().optional(),
+  /** Unit the stored value is expressed in. */
+  unit: z.string().optional(),
 });
 
 /**
